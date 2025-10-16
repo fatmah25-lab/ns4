@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>نَسمة — بوابة الضيافة الذكية</title>
+<style>
+  :root{
+    --bg1:#f7f3ee; --accent:#b58b4b; --muted:#6e5a46; --card:#fffdf7;
+    --success:#2e7d32; --danger:#d32f2f;
+  }
+  *{box-sizing:border-box}
+  body{font-family: "Cairo",sans-serif; margin:0; background:linear-gradient(180deg,var(--bg1),#fff); color:var(--muted);}
+  header{background:var(--accent); color:#fff; padding:18px 12px; display:flex; justify-content:space-between; align-items:center;}
+  header h1{margin:0;font-size:1.2rem}
+  header .team{font-size:.95rem; opacity:.95}
+  nav{display:flex; gap:8px; justify-content:center; padding:12px; flex-wrap:wrap; background:transparent;}
+  nav button{background:#fff0e6;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+  .container{max-width:1100px;margin:18px auto;padding:0 12px;}
+  .card{background:var(--card); border-radius:12px; padding:16px; box-shadow:0 6px 18px rgba(0,0,0,0.06); margin-bottom:16px;}
+  .sensors{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .sensor{min-width:150px;padding:12px;border-radius:10px;background:#f6f1ea;text-align:center}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  button.big{padding:10px 18px;border-radius:10px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+  button.small{padding:8px 12px;border-radius:8px;border:0;background:#eee;cursor:pointer}
+  .active{box-shadow:0 0 12px rgba(181,139,75,0.6)}
+  .flex{display:flex;gap:12px;align-items:center}
+  input[type="text"], select{padding:8px;border-radius:8px;border:1px solid #e0d6c7}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  footer{text-align:center;color:#fff;background:var(--accent);padding:12px;border-radius:0 0 8px 8px;margin-top:18px}
+  iframe.map{width:100%;height:420px;border:1px solid #e9e0d3;border-radius:8px}
+  pre.note{background:#fff7f0;padding:10px;border-radius:8px;color:#7a5e3a;font-size:0.95rem}
+  @media (max-width:900px){ .sensors{flex-direction:column;align-items:stretch} .row{flex-direction:column} header{flex-direction:column;gap:8px;align-items:flex-start} }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🌿 نَسمة — بوابة الضيافة الذكية</h1>
+    <div style="font-size:0.85rem;opacity:.95">تجربة حسّية وسياحية ذكية — الضيافة العربية تلتقي بالتقنية</div>
+  </div>
+  <div class="team">فريق <strong>آفاق السياحة</strong></div>
+</header>
+
+<nav id="nav">
+  <button data-view="home">الرئيسية</button>
+  <button data-view="guide">دليل الزائر</button>
+  <button data-view="maps">الخريطة (ظفار)</button>
+  <button data-view="currency">محول العملات</button>
+  <button data-view="recommend">اقتراح ذكي</button>
+  <button data-view="about">عن المشروع</button>
+</nav>
+
+<div class="container">
+  <!-- HOME -->
+  <section id="home" class="view card">
+    <h2>حالة الواحة الذكية</h2>
+    <div class="sensors">
+      <div class="sensor">
+        <h4>درجة الحرارة</h4>
+        <div id="temp">-- °C</div>
+      </div>
+      <div class="sensor">
+        <h4>الرطوبة</h4>
+        <div id="hum">-- %</div>
+      </div>
+      <div class="sensor">
+        <h4>جودة الهواء</h4>
+        <div id="air">--</div>
+      </div>
+      <div class="sensor">
+        <h4>المروحة</h4>
+        <div id="fan">--</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>تحكم الروائح</h3>
+      <div class="controls">
+        <button id="btn-coffee" class="big">☕ القهوة</button>
+        <button id="btn-oud" class="big">🌿 العود</button>
+        <button id="btn-musk" class="big">🌸 المسك</button>
+      </div>
+      <p style="margin-top:10px;color:#7a6b5a;font-size:0.95em">يمكنك التحكم بالروائح مباشرة من هنا أو من واجهة الـESP32/التطبيق.</p>
+    </div>
+    <div class="card">
+      <h3>ملاحظة تشغيلية</h3>
+      <pre class="note">قبل العرض: ضع عنوان الـESP32 في المتغير ESP32_IP في الكود أسفل الصفحة. إذا شُغّل الموقع من GitHub Pages تأكد أن التابلت متصل بنفس الشبكة المحلية أو فعّل CORS على ESP32 (server.sendHeader("Access-Control-Allow-Origin","*");).</pre>
+    </div>
+  </section>
+
+  <!-- GUIDE -->
+  <section id="guide" class="view card" style="display:none;">
+    <h2>🗺️ دليل الزائر — مناطق مختارة في ظفار</h2>
+    <p>بطاقات تعريفية مختصرة لأهم مواقع محافظة ظفار (صلالة والمناطق المحيطة).</p>
+    <div id="places" class="row"></div>
+  </section>
+
+  <!-- MAPS -->
+  <section id="maps" class="view card" style="display:none;">
+    <h2>خريطة محافظة ظفار — صلالة والمناطق المحيطة</h2>
+    <!-- Google Maps Embed (مركزة على ظفار) -->
+    <iframe class="map" src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d241183.07139584523!2d54.035!3d17.014!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sar!2som!4v1697040000000" allowfullscreen="" loading="lazy"></iframe>
+    <p style="margin-top:8px;color:#6b5a48;font-size:0.95em">الخريطة متمركزة على محافظة ظفار — صلالة. اضغط على العلامات داخل الخريطة لمزيد من التفاصيل.</p>
+  </section>
+
+  <!-- CURRENCY -->
+  <section id="currency" class="view card" style="display:none;">
+    <h2>💱 محول العملات</h2>
+    <div class="row">
+      <div style="flex:1">
+        <label>المبلغ</label><br>
+        <input type="text" id="amount" value="1">
+      </div>
+      <div style="flex:1">
+        <label>من</label><br>
+        <select id="from">
+          <option value="OMR">ريال عماني (OMR)</option>
+          <option value="SAR">ريال سعودي (SAR)</option>
+          <option value="USD">دولار أمريكي (USD)</option>
+          <option value="EUR">يورو (EUR)</option>
+        </select>
+      </div>
+      <div style="flex:1">
+        <label>إلى</label><br>
+        <select id="to">
+          <option value="USD">دولار أمريكي (USD)</option>
+          <option value="SAR">ريال سعودي (SAR)</option>
+          <option value="EUR">يورو (EUR)</option>
+          <option value="OMR">ريال عماني (OMR)</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <button id="convertBtn" class="big">تحويل</button>
+    </div>
+    <div style="margin-top:12px;">
+      <h3>النتيجة: <span id="convResult">--</span></h3>
+      <p style="font-size:0.9em;color:#6b5a48">المصدر: exchangerate.host</p>
+    </div>
+  </section>
+
+  <!-- RECOMMEND -->
+  <section id="recommend" class="view card" style="display:none;">
+    <h2>🧭 اقتراح ذكي للزائر</h2>
+    <p>اختر تفضيلك وسنقترح تجربة مناسبة:</p>
+    <div class="row">
+      <select id="pref">
+        <option value="relax">راحة واستجمام</option>
+        <option value="culture">ثقافة وتراث</option>
+        <option value="adventure">مغامرة ونشاط</option>
+        <option value="food">تجربة طعام/قهوة</option>
+      </select>
+      <button id="getRec" class="small">احصل على اقتراح</button>
+    </div>
+
+    <div style="margin-top:14px;" id="recBox" class="card">
+      <h3>الاقتراح</h3>
+      <p id="recText" style="font-size:1.05em;color:#554433">—</p>
+    </div>
+    <p style="margin-top:8px;color:#666;font-size:0.9em">التوصية تعتمد على بيانات الجو الحالية (التي يزودها نظام الواحة) وتفضيلك.</p>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="view card" style="display:none;">
+    <h2>عن نَسمة</h2>
+    <p>نَسمة هي بوابة الضيافة الذكية التي تدمج التحكم البيئي بالتراث العربي — رائحة القهوة، العود، والمسك — مع معلومات سياحية ذكية وتجربة رقمية متكاملة.</p>
+    <p>الفريق: <strong>آفاق السياحة</strong></p>
+  </section>
+</div>
+
+<footer>© 2025 نَسمة — بوابة الضيافة الذكية</footer>
+
+<script>
+/* =========================
+   إعداداتك: ضع IP الـESP32 هنا
+   ========================= */
+const ESP32_IP = "192.168.1.55"; // غيّره لعنوان جهازك المحلي (نقطة مهمة للعرض)
+
+/* ---------- تنقّل بين الصفحات ---------- */
+document.querySelectorAll('#nav button').forEach(btn=>{
+  btn.addEventListener('click', ()=> {
+    const view = btn.getAttribute('data-view');
+    document.querySelectorAll('.view').forEach(v=>v.style.display='none');
+    document.getElementById(view).style.display='block';
+  });
+});
+
+/* ---------- تحديث حسّاسات من ESP32 ---------- */
+async function updateSensors(){
+  try{
+    const res = await fetch(`http://${ESP32_IP}/sensors`, {cache:'no-store'});
+    if(!res.ok) throw new Error('no data');
+    const data = await res.json();
+    document.getElementById('temp').innerText = data.temp + ' °C';
+    document.getElementById('hum').innerText = data.hum + ' %';
+    document.getElementById('air').innerText = data.air;
+    document.getElementById('fan').innerText = (parseInt(data.air) > 400) ? 'تشغيل' : 'إيقاف';
+  }catch(e){
+    document.getElementById('temp').innerText = '-- °C';
+    document.getElementById('hum').innerText = '-- %';
+    document.getElementById('air').innerText = '--';
+    document.getElementById('fan').innerText = '--';
+    console.warn('تعذر الوصول للـESP32:', e);
+  }
+}
+setInterval(updateSensors,3000); updateSensors();
+
+/* ---------- أوامر الروائح (من الموقع إلى ESP32) ---------- */
+function sendCmd(type, state){
+  fetch(`http://${ESP32_IP}/${type}?state=${state}`).catch(e=>console.warn('cmd err',e));
+}
+document.getElementById('btn-coffee').addEventListener('click', function(){
+  const active = this.classList.toggle('active');
+  sendCmd('coffee', active?1:0);
+});
+document.getElementById('btn-oud').addEventListener('click', function(){
+  const active = this.classList.toggle('active');
+  sendCmd('oud', active?1:0);
+});
+document.getElementById('btn-musk').addEventListener('click', function(){
+  const active = this.classList.toggle('active');
+  sendCmd('musk', active?1:0);
+});
+
+/* ---------- محول العملات (exchangerate.host) ---------- */
+document.getElementById('convertBtn').addEventListener('click', async ()=>{
+  const amount = parseFloat(document.getElementById('amount').value) || 1;
+  const from = document.getElementById('from').value;
+  const to = document.getElementById('to').value;
+  const url = `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`;
+  try{
+    const res = await fetch(url);
+    const json = await res.json();
+    if(json.success){
+      document.getElementById('convResult').innerText = `${json.result.toFixed(3)} ${to}`;
+    } else {
+      document.getElementById('convResult').innerText = 'فشل الحصول على السعر';
+    }
+  }catch(e){
+    document.getElementById('convResult').innerText = 'خطأ في الاتصال';
+    console.warn(e);
+  }
+});
+
+/* ---------- محتوى دليل الزائر (أمثلة وهمية لمنطقة ظفار) ---------- */
+const places = [
+  {title:'ساحة التراث (صلالة)', desc:'جلسات قهوة عربية وعروض تقليدية', tag:'قهوة', coords:[17.015,54.091]},
+  {title:'متحف ظفار', desc:'تاريخ المنطقة وتراثها البحري', tag:'ثقافة', coords:[17.044,54.087]},
+  {title:'ميدان الكثبان (ظفار)', desc:'نشاطات رملية ومغامرات', tag:'مغامرة', coords:[16.950,54.120]},
+  {title:'مطعم العود (صلالة)', desc:'أطباق عربية وقهوة تقليدية', tag:'طعام', coords:[17.020,54.100]}
+];
+const placesDiv = document.getElementById('places');
+places.forEach(p=>{
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.style.flex='1 1 220px';
+  el.style.minWidth='220px';
+  el.innerHTML = `<h4>${p.title}</h4><p style="color:#6b5a48">${p.desc}</p><p style="font-size:0.9em;color:#8a755f">نوع: ${p.tag}</p>`;
+  placesDiv.appendChild(el);
+});
+
+/* ---------- نظام التوصيات البسيط (ذكاء محلي) ---------- */
+document.getElementById('getRec').addEventListener('click', async ()=>{
+  const pref = document.getElementById('pref').value;
+  // نقرأ القيم الحقيقية قبل اقتراح
+  let temp= null, hum=null, air=null;
+  try{
+    const res = await fetch(`http://${ESP32_IP}/sensors`, {cache:'no-store'});
+    const json = await res.json();
+    temp = parseFloat(json.temp); hum = parseFloat(json.hum); air = parseInt(json.air);
+  }catch(e){
+    temp = 30; hum = 45; air = 350;
+  }
+
+  let rec = '';
+  if(air > 400) {
+    rec = 'الهواء غير نقي الآن؛ ننصح بالجلوس داخل الواحة حيث يعمل نظام التنقية وتجربة رائحة المسك.';
+  } else {
+    if(pref === 'relax'){
+      rec = (temp>33) ? 'الجو حار؛ تجربة ركن القهوة داخل المظلة ستكون مريحة.' : 'جلسة المسك في المساء مع إضاءة دافئة ستكون مثالياً.';
+    } else if(pref === 'culture'){
+      rec = 'زور متحف ظفار وتعرّف على الحرف المحلية، ثم استمتع بفنجان قهوة عربية.';
+    } else if(pref === 'adventure'){
+      rec = (temp<30) ? 'انطلق إلى ميدان الكثبان لجولة قصيرة مع دليل محلي.' : 'الوقت حار؛ اقترح جولة عند الغروب.';
+    } else if(pref === 'food'){
+      rec = 'زور مطعم العود في صلالة لتذوق أطباق الضيافة والقهوة التقليدية.';
+    }
+  }
+  document.getElementById('recText').innerText = rec;
+});
+
+/* ---------- اختيار الصفحة الافتراضية ---------- */
+window.addEventListener('load', ()=> {
+  document.querySelector('#nav button[data-view="home"]').click();
+});
+</script>
+
+</body>
+</html>
